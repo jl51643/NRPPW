@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+      integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+      integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+      crossorigin=""
+    ></script>
+    <style>
+      #mapId {
+        height: 300px;
+      }
+    </style>
+    
+  </head>
+  <body>
+    <h1>Your current location:</h1>
+    <button style="float: right;" href="/private" onclick="a()">Log in</button>
+    <p>
+      latitude: <span id="latitude"></span>&deg;<br />
+      longitude: <span id="longitude"></span>&deg;
+    </p>
+    <div id="mapId"></div>
+    <script>
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          lat = position.coords.latitude;
+          lon = position.coords.longitude;
+
+          document.getElementById('latitude').textContent = lat;
+          document.getElementById('longitude').textContent = lon;
+
+          const mymap = L.map('mapId').setView([lat, lon], 15);
+          const attribution =
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+          const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+          const tiles = L.tileLayer(tileUrl, { attribution });
+          tiles.addTo(mymap);
+          const marker = L.marker([lat, lon]).addTo(mymap);
+
+        });
+      } 
+    </script>
+
+    <script>
+        function a() {
+            fetch('/private', {method: POST, body: {
+                position: {
+                    latitude: document.getElementById("latitude").textContent,
+                    longitude: document.getElementById("longitude").textContent
+                }
+            }})
+        }
+    </script>
+  </body>
+</html>
