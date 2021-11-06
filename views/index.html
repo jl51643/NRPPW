@@ -1,63 +1,105 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
-      integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
-      crossorigin=""
-    />
-    <script
-      src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
-      integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
-      crossorigin=""
-    ></script>
-    <style>
-      #mapId {
-        height: 300px;
-      }
-    </style>
-    
-  </head>
-  <body>
-    <h1>Your current location:</h1>
-    <button style="float: right;" href="/private" onclick="a()">Log in</button>
-    <p>
-      latitude: <span id="latitude"></span>&deg;<br />
-      longitude: <span id="longitude"></span>&deg;
-    </p>
-    <div id="mapId"></div>
-    <script>
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(position => {
-          lat = position.coords.latitude;
-          lon = position.coords.longitude;
 
-          document.getElementById('latitude').textContent = lat;
-          document.getElementById('longitude').textContent = lon;
+<head>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+		integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+		crossorigin="" />
+	<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+		integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+		crossorigin=""></script>
+	<style>
+		#mapId {
+			height: 500px;
+			width: 100%;
+		}
+	</style>
 
-          const mymap = L.map('mapId').setView([lat, lon], 15);
-          const attribution =
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-          const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-          const tiles = L.tileLayer(tileUrl, { attribution });
-          tiles.addTo(mymap);
-          const marker = L.marker([lat, lon]).addTo(mymap);
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-        });
-      } 
-    </script>
+</head>
 
-    <script>
-        function a() {
-            fetch('/private', {method: POST, body: {
-                position: {
-                    latitude: document.getElementById("latitude").textContent,
-                    longitude: document.getElementById("longitude").textContent
-                }
-            }})
-        }
-    </script>
-  </body>
+<body>
+	<div class="container">
+		<nav class="navbar navbar-light bg-info align-end">
+			<ul class="navbar-nav list-inline">
+				<li class="nav-item col-2"><a href="/private"><button class="btn btn-success">Log in</button></a></li>
+				<li class="nav-item col-2"><a href="sign-up"><button class="btn btn-success">Sing up</button></a></li>
+				<li class="nav-item col-2"><a href="logout"><button class="btn btn-success">Log out</button></a></li>
+			</ul>
+		</nav>
+	</div>
+
+
+
+
+	<div class="container">
+		<h1>Your current location:</h1>
+		<div class="text-left">
+			latitude: <span id="latitude"></span>&deg;<br />
+			longitude: <span id="longitude"></span>&deg;
+		</div>
+	</div>
+
+	<div class="container">
+		<div id="mapId"></div>
+	</div>
+
+	<script>
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(position => {
+				lat = position.coords.latitude;
+				lon = position.coords.longitude;
+
+				document.getElementById('latitude').textContent = lat;
+				document.getElementById('longitude').textContent = lon;
+
+				const mymap = L.map('mapId').setView([lat, lon], 15);
+				const attribution =
+					'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+				const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+				const tiles = L.tileLayer(tileUrl, {
+					attribution
+				});
+				tiles.addTo(mymap);
+				const marker = L.marker([lat, lon]).addTo(mymap);
+
+				const data = {
+					lat,
+					lon
+				}
+				const options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(data),
+
+				}
+
+				fetch('/userLocation', options)
+
+
+				getData(mymap)
+
+			});
+		}
+
+		const getData = async function (mymap) {
+			const response = await fetch("/recentUsers")
+			const data = await response.json()
+			addRecentUsers(data, mymap)
+		}
+
+		const addRecentUsers = async (users, map) => {
+			for (let i = 0; i < users.length; i++) {
+				const newMarker = L.marker([users[i].latitude, users[i].longitude])
+				const popup = newMarker.bindPopup(`user:${users[i].user}  last log in:${users[i].date}`)
+				popup.addTo(map)
+			}
+		}
+	</script>
+</body>
+
 </html>
