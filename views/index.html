@@ -28,6 +28,9 @@
 				<li class="nav-item col-2"><a href="sign-up"><button class="btn btn-success">Sing up</button></a></li>
 				<li class="nav-item col-2"><a href="logout"><button class="btn btn-success">Log out</button></a></li>
 			</ul>
+			<div class="pull-right" >
+				<a href="/private" id="activeUser" class="btn btn-primary"></a>
+			</div>
 		</nav>
 	</div>
 
@@ -80,8 +83,9 @@
 
 				fetch('/userLocation', options)
 
-
 				getData(mymap)
+
+				getActiveUser()
 
 			});
 		}
@@ -99,6 +103,20 @@
 				popup.addTo(map)
 			}
 		}
+
+		const getActiveUser = async () => {
+			const response = await fetch("/user")
+			console.log(response)
+			const user = await response.json()
+			console.log(response.status)
+			const activeUser = document.getElementById("activeUser")
+			if (response.status == 200) {
+				activeUser.textContent = user.user
+			} else {
+				activeUser.style.display = 'none'
+			}
+		}
+
 	</script>
 </body>
 

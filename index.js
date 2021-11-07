@@ -60,6 +60,20 @@ app.get('/recentUsers', (req, res) => {
 
 		const recentUsers = getRecentUsers(users, req.oidc.user.name)
 		res.send(recentUsers)
+	} else {
+		res.send(401, {message : 'Unautorised'})
+	}
+})
+
+app.get('/user', (req, res) => {
+	req.user = {
+		isAuthenticated: req.oidc.isAuthenticated()
+	}
+	if (req.user.isAuthenticated) {
+		console.log(req.oidc.user.name)
+		res.send(200, {user: req.oidc.user.name})
+	} else {
+		res.send(401, {message : 'Unautorised'})
 	}
 })
 
@@ -83,6 +97,8 @@ app.post('/userLocation', (req, res) => {
 		})
 
 		console.log(users)
+	} else {
+		res.send(401, {message : 'Unautorised'})
 	}
 })
 
@@ -113,13 +129,6 @@ if (!process.env.PORT) {
 } else {
 	app.listen(port, () => console.log(`Server running at ${baseUrl}`))
 }
-
-/*https.createServer({
-	key: fs.readFileSync(__dirname + '/cert/server.key'),
-	cert: fs.readFileSync(__dirname + '/cert/server.cert'),
-}, app)
-	.listen(port, () => console.log(`Server running at http://${hostname}:${port}/`))*/
-
 
 function getRecentUsers(users, user) {
 	const recentUsers = []
