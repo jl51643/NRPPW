@@ -104,11 +104,21 @@ app.get("/sign-up", (req, res) => {
 
 const hostname = '127.0.0.1';
 
-https.createServer({
+if (!process.env.PORT) {
+	https.createServer({
+		key: fs.readFileSync(__dirname + '/cert/server.key'),
+		cert: fs.readFileSync(__dirname + '/cert/server.cert'),
+	}, app)
+		.listen(port, () => console.log(`Server running at http://${hostname}:${port}/`))
+} else {
+	app.listen(port, () => console.log(`Server running at ${baseUrl}`))
+}
+
+/*https.createServer({
 	key: fs.readFileSync(__dirname + '/cert/server.key'),
 	cert: fs.readFileSync(__dirname + '/cert/server.cert'),
 }, app)
-	.listen(port, () => console.log(`Server running at http://${hostname}:${port}/`))
+	.listen(port, () => console.log(`Server running at http://${hostname}:${port}/`))*/
 
 
 function getRecentUsers(users, user) {
