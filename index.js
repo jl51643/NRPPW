@@ -10,6 +10,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 app.use(express.static('public'));
+app.engine('pug', require('pug').__express)
 app.set('view engine', 'pug');
 
 app.use(express.json())
@@ -87,8 +88,9 @@ app.post('/userLocation', (req, res) => {
 
 app.get('/private', requiresAuth(), (req, res) => {
 	const user = JSON.stringify(req.oidc.user)
-	console.log(user.niskname)
-	res.render('private', {user})
+	const u = JSON.parse(user)
+	console.log(u)
+	res.render('private', {u})
 })
 
 app.get("/sign-up", (req, res) => {
