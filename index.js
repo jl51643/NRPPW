@@ -18,7 +18,7 @@ app.use(express.json())
 const { auth, requiresAuth } = require('express-openid-connect')
 const port = process.env.PORT || 4080;
 
-const baseURL = process.env.APP_URL || `https://localhost:${port}`
+const baseURL = process.env.APP_URL || `http://localhost:${port}`
 
 const config = {
 	authRequired: false,
@@ -113,7 +113,7 @@ if (!process.env.PORT) {
 		key: fs.readFileSync(__dirname + '/cert/server.key'),
 		cert: fs.readFileSync(__dirname + '/cert/server.cert'),
 	}, app)
-		.listen(port, () => console.log(`Server running at http://${hostname}:${port}/`))
+		.listen(port, () => console.log(`Server running at https://${hostname}:${port}/`))
 } else {
 	app.listen(port, () => console.log(`Server running on ${baseURL}`))
 }
