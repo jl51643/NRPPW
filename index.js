@@ -17,12 +17,12 @@ app.use(express.json())
 const { auth, requiresAuth } = require('express-openid-connect')
 const port = process.env.PORT || 4080;
 
-var baseURL 
+var baseUrl 
 
 if (process.env.PORT) {
-	baseURL = process.env.APP_URL
+	baseUrl = process.env.APP_URL
 } else {
-	baseURL = `https://localhost:${port}`
+	baseUrl = `https://localhost:${port}`
 }
 
 const config = {
@@ -30,7 +30,7 @@ const config = {
 	idpLogout: true,
 	auth0Logout: true,
 	issuerBaseURL: process.env.ISSUER_BASE_URL,
-	baseURL: baseURL,
+	baseURL: baseUrl,
 	clientID: process.env.CLIENT_ID,
 	secret: process.env.SECRET,
 	clientSecret: process.env.CLIENT_SECRET,
