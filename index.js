@@ -18,20 +18,14 @@ app.use(express.json())
 const { auth, requiresAuth } = require('express-openid-connect')
 const port = process.env.PORT || 4080;
 
-var baseUrl 
-
-if (process.env.PORT) {
-	baseUrl = process.env.APP_URL
-} else {
-	baseUrl = `https://localhost:${port}`
-}
+const baseURL = process.env.APP_URL || `https://localhost:${port}`
 
 const config = {
 	authRequired: false,
 	idpLogout: true,
 	auth0Logout: true,
 	issuerBaseURL: process.env.ISSUER_BASE_URL,
-	baseURL: baseUrl,
+	baseURL: baseURL,
 	clientID: process.env.CLIENT_ID,
 	secret: process.env.SECRET,
 	clientSecret: process.env.CLIENT_SECRET,
@@ -92,8 +86,6 @@ app.post('/userLocation', (req, res) => {
 			longitude : req.body.lon,
 			date
 		})
-
-		console.log(users)
 	} else {
 		res.send(401, {message : 'Unautorised'})
 	}
@@ -102,7 +94,6 @@ app.post('/userLocation', (req, res) => {
 app.get('/private', requiresAuth(), (req, res) => {
 	const user = JSON.stringify(req.oidc.user)
 	const u = JSON.parse(user)
-	console.log(u)
 	res.render('private', {u})
 })
 
@@ -124,7 +115,7 @@ if (!process.env.PORT) {
 	}, app)
 		.listen(port, () => console.log(`Server running at http://${hostname}:${port}/`))
 } else {
-	app.listen(port, () => console.log(`Server running at ${baseUrl}`))
+	app.listen(port, () => console.log(`Server running on ${baseURL}`))
 }
 
 function getRecentUsers(users, user) {
