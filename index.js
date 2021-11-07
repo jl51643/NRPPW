@@ -59,7 +59,8 @@ app.get('/recentUsers', (req, res) => {
 	if (req.user.isAuthenticated) {
 
 		const recentUsers = getRecentUsers(users, req.oidc.user.name)
-		res.send(recentUsers)
+		res.send(200, {user: req.oidc.user.name,
+			 			recentUsers: recentUsers})
 	} else {
 		res.send(401, {message : 'Unautorised'})
 	}
@@ -70,7 +71,6 @@ app.get('/user', (req, res) => {
 		isAuthenticated: req.oidc.isAuthenticated()
 	}
 	if (req.user.isAuthenticated) {
-		console.log(req.oidc.user.name)
 		res.send(200, {user: req.oidc.user.name})
 	} else {
 		res.send(401, {message : 'Unautorised'})
@@ -86,9 +86,6 @@ app.post('/userLocation', (req, res) => {
 		const user = req.oidc.user.name
 		const date = new Date() 
 
-		console.log(date)
-		
-		console.log(req.body)
 		users.unshift({
 			user,
 			latitude : req.body.lat,

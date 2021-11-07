@@ -66,8 +66,7 @@
 					attribution
 				});
 				tiles.addTo(mymap);
-				const marker = L.marker([lat, lon]).addTo(mymap);
-
+				
 				const data = {
 					lat,
 					lon
@@ -83,33 +82,42 @@
 
 				fetch('/userLocation', options)
 
-				getData(mymap)
+				getData(mymap, lat, lon)
 
 				getActiveUser()
 
 			});
 		}
 
-		const getData = async function (mymap) {
+		const getData = async function (mymap, lat, lon) {
 			const response = await fetch("/recentUsers")
-			const data = await response.json()
-			addRecentUsers(data, mymap)
+			if (response.status == 401) {
+				const marker = L.marker([lat, lon]).addTo(mymap);
+			} else if (response.status == 200) {
+				const data = await response.json()
+				addRecentUsers(data, mymap, lat, lon)
+			}
 		}
 
-		const addRecentUsers = async (users, map) => {
-			for (let i = 0; i < users.length; i++) {
-				const newMarker = L.marker([users[i].latitude, users[i].longitude])
-				const popup = newMarker.bindPopup(`user:${users[i].user}  last log in:${users[i].date}`)
-				popup.addTo(map)
+		const addRecentUsers = async (users, map, lat, lon) => {
+
+			const marker = L.marker([lat, lon]).addTo(map);
+			const popup = marker.bindPopup(`user:${users.user}  last log in:${new Date()}`)
+			popup.addTo(map)
+
+			for (let i = 0; i < users.recentUsers.length; i++) {
+				const newMarker = L.marker([users.recentUsers[i].latitude, users.recentUsers[i].longitude])
+				const newPopup = newMarker.bindPopup(`user:${users.recentUsers[i].user}  last log in:${users.recentUsers[i].date}`)
+				newPopup.addTo(map)
 			}
 		}
 
 		const getActiveUser = async () => {
 			const response = await fetch("/user")
-			console.log(response)
 			const user = await response.json()
-			console.log(response.status)
+
 			const activeUser = document.getElementById("activeUser")
+
 			if (response.status == 200) {
 				activeUser.textContent = user.user
 			} else {
